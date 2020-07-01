@@ -14,6 +14,8 @@ TagManager:
   - Nest
   - Door
   - GhostFire
+  - Button
+  - KaoShiung
   layers:
   - Default
   - TransparentFX
@@ -26,7 +28,7 @@ TagManager:
   - PostProcessing
   - VR(invisiable)
   - PC(invisiable)
-  - 
+  - VR&PC(invisiable)
   - 
   - 
   - 

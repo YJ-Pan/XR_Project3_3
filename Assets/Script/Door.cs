@@ -26,7 +26,7 @@ public class Door : MonoBehaviour
     {
         if (other.gameObject.name == "Toon Chicken")
         {
-            Debug.Log("ChickenOut");
+            //Debug.Log("ChickenOut");
             //origChicken = other.gameObject;
             origChicken.SetActive(false);
             origChicken.transform.position = chickenPos;

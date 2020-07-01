@@ -64,6 +64,29 @@ public class Scenario : MonoBehaviour
         }
     }
 
+    public void GoDown()
+    {
+        if (dialogText.GetComponent<TypewriterEffect>().isActive)
+        {
+            dialogText.GetComponent<TypewriterEffect>().OnFinish();
+        }
+        else
+        {
+            count++;
+
+            if (count < sentence.Count)
+            {
+                dialogText.GetComponent<TypewriterEffect>().newWords = sentence[count];
+            }
+            else
+            {
+                talk = false;
+                dialogText.GetComponent<Text>().text = "";
+                dialog.SetActive(false);
+            }
+        }
+    }
+
     private void readFile(string filename)
     {
         sentence.Clear();

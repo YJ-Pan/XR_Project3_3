@@ -7,7 +7,8 @@ public class EnemyManager : MonoBehaviour
     //public GameManager gameManager;
     public GameObject eagle;
     public Transform treePos;
-    public float InstantiateTime = 1.0f;
+    public float UsuallyInstantiateTime;
+    private float InstantiateTime;
 
     public bool generate = false;
     public bool end = false;
@@ -26,7 +27,7 @@ public class EnemyManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Count > 1 && childEagle == null)
+        if (Count > 2 && childEagle == null)
         {
             Count = 0;
             end = true;
@@ -34,6 +35,15 @@ public class EnemyManager : MonoBehaviour
         }
         if (generate && childEagle == null && !instantiateOn)
         {
+            if (Count == 0)
+            {
+                InstantiateTime = 10.0f;
+            }
+            else
+            {
+                InstantiateTime = UsuallyInstantiateTime;
+            }
+
             instantiateOn = true;
             StartCoroutine("InstantiateEagle");
         }

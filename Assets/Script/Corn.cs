@@ -5,8 +5,7 @@ using UnityEngine;
 public class Corn : MonoBehaviour
 {
     public Camera gameCamera;
-    public GameObject chicken1;
-    public GameObject chicken2;
+    public GameObject chicken;
 
     private Vector3 screenPoint;
     private Vector3 offset;
@@ -20,20 +19,12 @@ public class Corn : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Vector3.Distance(gameObject.transform.position, chicken1.transform.position) < 3.0f)
+        if (Vector3.Distance(gameObject.transform.position, chicken.transform.position) < 3.0f)
         {
             Vector3 dir = gameObject.transform.position;
-            chicken1.transform.LookAt(dir);
+            chicken.transform.LookAt(dir);
             //chicken1.transform.position += 0.1f * chicken1.transform.forward;
-            chicken1.transform.Translate(chicken1.transform.forward * Time.deltaTime, Space.World);
-        }
-
-        if (Vector3.Distance(gameObject.transform.position, chicken2.transform.position) < 3.0f)
-        {
-            Vector3 dir = gameObject.transform.position;
-            chicken2.transform.LookAt(dir);
-            //chicken2.transform.position += 0.1f * chicken2.transform.forward;
-            chicken2.transform.Translate(chicken2.transform.forward * Time.deltaTime, Space.World);
+            chicken.transform.Translate(chicken.transform.forward * Time.deltaTime, Space.World);
         }
     }
 
@@ -55,7 +46,7 @@ public class Corn : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.name == chicken1.name || other.name == chicken2.name)
+        if (other.name == chicken.name)
         {
             gameObject.SetActive(false);
         }

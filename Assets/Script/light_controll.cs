@@ -11,6 +11,7 @@ public class light_controll : MonoBehaviour
     public AudioSource BGM;
     public AudioSource nightBGM;
     public AudioClip morning;
+    public GameObject star_night, crowds;
 
     bool dayToNight;
     bool nightToDay;
@@ -26,6 +27,8 @@ public class light_controll : MonoBehaviour
         nightToDay = false;
         count = 0;
         Max = 0;
+        star_night.SetActive(false);
+        crowds.SetActive(true);
     }
 
     // Update is called once per frame
@@ -45,7 +48,10 @@ public class light_controll : MonoBehaviour
                 }
                 BGM.Stop();
                 nightBGM.Play();
-                
+
+                star_night.SetActive(true);
+                crowds.SetActive(false);
+
                 isDay = false;
             }
         }
@@ -61,6 +67,10 @@ public class light_controll : MonoBehaviour
             nightBGM.Stop();
             BGM.clip = morning;
             BGM.Play();
+
+            star_night.SetActive(false);
+            crowds.SetActive(true);
+
             isDay = true;
         }
 

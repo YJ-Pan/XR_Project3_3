@@ -17,8 +17,6 @@ public class Eagle : MonoBehaviour
     void Start()
     {
         orig_pos = gameObject.transform.position;
-        if(gameObject.tag == "Enemy")
-            StartCoroutine("Reset");
     }
 
     // Update is called once per frame
@@ -61,9 +59,5 @@ public class Eagle : MonoBehaviour
         }
     }
 
-    IEnumerator Reset()
-    {
-        yield return new WaitForSeconds(33.0f);
-        Destroy(gameObject);
-    }
+    
 }

@@ -7,7 +7,9 @@ public class Trans : MonoBehaviour
 {
     public enum Charactor
     {
-        Parrot
+        Tree,
+        Parrot,
+        Cat
     }
 
     public Charactor charactor;
@@ -29,7 +31,11 @@ public class Trans : MonoBehaviour
     {
         if (other.CompareTag("GhostFire"))
         {
-            charactor = Charactor.Parrot;
+            if(charactor == Charactor.Tree)
+                charactor = Charactor.Parrot;
+            else if(charactor == Charactor.Parrot)
+                charactor = Charactor.Cat;
+
             isTrans = true;
         }
     }

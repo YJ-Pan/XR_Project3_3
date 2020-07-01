@@ -5,16 +5,6 @@ using Valve.VR;
 
 public class branch : MonoBehaviour
 {
-    // Start is called before the first frame update
-    /*public enum Fruit
-    {
-        None,
-        Apple,
-        Banana,
-        Kiwi,
-        Pear,
-        Strawberry
-    }*/
     public List<GameObject> fruits;
     public SteamVR_Behaviour_Boolean steamVR_Behaviour_Boolean;
     bool changefruit = false;
@@ -22,12 +12,16 @@ public class branch : MonoBehaviour
     public Transform controller;
     public Transform fruitPos;
 
+    public GameManager gameManager;
+
     private GameObject currentFruit;
     private int currentIdx;
 
     Vector3 last_rot;
     int counter = 0;
-    
+    int fruitCount = 0;
+
+    // Start is called before the first frame update
     void Start()
     {
         currentFruit = null;
@@ -38,6 +32,13 @@ public class branch : MonoBehaviour
     void Update()
     {
         //gameObject.transform.forward = controller.forward;
+        if (gameManager.chapter == GameManager.Chapter.Tree_night)
+        {
+            fruitCount = 0;
+            for (int i = 1; i < fruits.Count; ++i)
+                fruits[i].SetActive(false);
+        }
+
         changefruit = SteamVR_Input.GetStateDown("default", "changeFruit", steamVR_Behaviour_Boolean.inputSource);
         if(changefruit)
         {
@@ -45,7 +46,7 @@ public class branch : MonoBehaviour
             if (currentFruit != null)
                 currentFruit.SetActive(false);
 
-            if (currentIdx < fruits.Count)
+            if (currentIdx < fruits.Count && fruitCount < 21)
             {
                 currentFruit = fruits[currentIdx];
                 currentFruit.SetActive(true);
@@ -66,7 +67,11 @@ public class branch : MonoBehaviour
                 currentFruit.tag = "Fruit";
                 currentFruit = null;
                 counter = 0;
-            }else{
+                if (gameManager.chapter == GameManager.Chapter.Tree)
+                    fruitCount++;
+            }
+            else
+            {
                 currentFruit.transform.position = fruitPos.position;
             }
             computeRot();

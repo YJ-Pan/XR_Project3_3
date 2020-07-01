@@ -9,10 +9,12 @@ public class cursor : MonoBehaviour
     public Camera gameCamera;
     public GameObject hint;
     public GameObject UI;
+    public UIManager uIManager;
     public int NestLife;
     public int waterVolume;
 
     [Header("Audio")]
+    public AudioSource waterBank;
     public AudioClip cockCrow;
     public AudioClip waterSound;
     public AudioClip broken;
@@ -21,13 +23,15 @@ public class cursor : MonoBehaviour
     [Header("PC Player")]
     public AngelAI angel;
     public bool day = false;
+    public int NightChickCount = 0;
     public int InteractionCount = 0;
+    public int MaxCount;
     public GameObject corn;
     public Transform cornPos;
     bool ActiveCornOn = false;
     public Door door;
 
-
+    private List<GameObject> brokenPlate;
     private GameObject currentObject;
 
     // Start is called before the first frame update
@@ -35,6 +39,7 @@ public class cursor : MonoBehaviour
     {
         Cursor.visible = true;
         waterVolume = 100;
+        brokenPlate = new List<GameObject>();
     }
 
     // Update is called once per frame
@@ -126,9 +131,17 @@ public class cursor : MonoBehaviour
                     if(hit.transform.gameObject.name == "Toon Chicken")
                     {
                         hit.transform.gameObject.GetComponent<AudioSource>().PlayOneShot(cockCrow);
-                        angel.goOut += 1.0f;
+                        angel.goOut_tree += 5.0f;
                         if (day)
+                        {
                             InteractionCount++;
+                            angel.calculateProb();
+                        }
+                        else
+                        {
+                            NightChickCount++;
+                        }
+                        StartCoroutine("WaitCursor");
                     }
                     else if (hit.transform.gameObject.name == "water bank")
                     {
@@ -137,37 +150,66 @@ public class cursor : MonoBehaviour
                             hit.transform.gameObject.GetComponent<AudioSource>().PlayOneShot(waterSound);
                             waterVolume -= 20;
                             hint.GetComponentInChildren<Text>().text = "水缸\n剩餘水量: " + waterVolume.ToString();
-                            if(day)
-                                InteractionCount++;
-
-                            if (waterVolume < 60)
+                            angel.goOut_water = 100.0f - waterVolume;
+                            if (day)
                             {
-                                angel.goOut += 10.0f;
-                                angel.scare += 10.0f;
+                                angel.scare += 20.0f;
+                                InteractionCount++;
                                 angel.calculateProb();
+                            }
+                            else
+                            {
+                                angel.scare += 10.0f;
                             }
                         }
                         else
                         {
                             hint.GetComponentInChildren<Text>().text = "沒水了啦!\n Q A Q";
-                            angel.goOut = 100.0f;
-                            angel.calculateProb();
+                            angel.goOut_water = 100.0f - waterVolume;
+                            if (day)
+                            {
+                                angel.calculateProb();
+                            }
                         }
+                        StartCoroutine("WaitCursor");
                     }
                     else if (hit.transform.gameObject.name == "Guzheng")
                     {
                         hit.transform.gameObject.GetComponent<AudioSource>().PlayOneShot(guzheng);
+                        angel.goOut_tree += 20.0f;
+                        
+                        if (day)
+                        {
+                            angel.scare += 20.0f;
+                            InteractionCount++;
+                            angel.calculateProb();
+                        }
+                        else
+                        {
+                            angel.scare += 30.0f;
+                        }
+                        StartCoroutine("WaitCursor");
                     }
                     else if (hit.transform.gameObject.name == "plate")
                     {
                         gameObject.GetComponent<AudioSource>().PlayOneShot(broken);
+                        brokenPlate.Add(hit.transform.gameObject);
                         hit.transform.gameObject.SetActive(false);
-                        if(day)
+                        angel.goOut_plateshop += 10.0f;
+                        
+                        if (day)
+                        {
+                            angel.scare += 10.0f;
                             InteractionCount++;
-                        angel.goOut += 10.0f;
-                        angel.scare += 10.0f;
+                            angel.calculateProb();
+                        }
+                        else
+                        {
+                            angel.scare += 15.0f;
+                        }
+                        StartCoroutine("WaitCursor");
                     }
-                    Debug.Log("Count: " + InteractionCount);
+                    //Debug.Log("Count: " + InteractionCount);
                 }
                 
             }
@@ -188,11 +230,12 @@ public class cursor : MonoBehaviour
 
         if(day)
         {
-            if(InteractionCount > 4)
+            if(InteractionCount >= MaxCount)
             {
                 day = false;
                 InteractionCount = 0;
                 corn.SetActive(false);
+                uIManager.isEndDay = false;
             }
             else if (!corn.activeSelf && !ActiveCornOn)
             {
@@ -203,12 +246,28 @@ public class cursor : MonoBehaviour
             if(door.chickenOut)
             {
                 corn.SetActive(false);
-                angel.goOut = 100.0f;
                 angel.chickenOut = true;
                 angel.calculateProb();
                 door.chickenOut = false;
             }
 
+        }
+
+        if (angel.fillwater)
+        {
+            waterBank.PlayOneShot(waterSound);
+            waterVolume = 100;
+            angel.fillwater = false;
+        }
+
+        if (angel.fillplate)
+        {
+            for(int i=0;i< brokenPlate.Count; i++)
+            {
+                brokenPlate[i].SetActive(true);
+            }
+            brokenPlate.Clear();
+            angel.fillplate = false;
         }
 
         if (angel.pickChicken && door.origChicken != null)
@@ -226,5 +285,22 @@ public class cursor : MonoBehaviour
         corn.SetActive(true);
         InteractionCount++;
         ActiveCornOn = false;
+    }
+
+    IEnumerator WaitCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        yield return new WaitForSeconds(1.0f);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    public void EndDay()
+    {
+        day = false;
+        InteractionCount = 0;
+        corn.SetActive(false);
+        uIManager.isEndDay = false;
     }
 }
